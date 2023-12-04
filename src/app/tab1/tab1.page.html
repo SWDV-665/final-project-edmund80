@@ -1,17 +1,52 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
-    <ion-title>
-      Tab 1
+    <ion-title class="title">
+      {{ title }}
     </ion-title>
   </ion-toolbar>
 </ion-header>
 
-<ion-content [fullscreen]="true">
+<ion-content [fullscreen]="true" padding>
   <ion-header collapse="condense">
     <ion-toolbar>
-      <ion-title size="large">Tab 1</ion-title>
+      <ion-title size="large">Grocery</ion-title>
     </ion-toolbar>
   </ion-header>
+  <h3 class="no-item" text-center *ngIf="items && items.length === 0">
+    No item available on the list!
+  </h3>
+  <ion-list *ngIf="items.length > 0">
+    <ion-item-sliding *ngFor="let item of items; let i = index">
+      <ion-item>
+        <ion-label class="name">{{ item.name }}</ion-label><br />
+        <h2 class="quantity">{{ item.quantity }}</h2>
+      </ion-item>
+      
+      <ion-item-options side="end">
+        <ion-item-option (click)="editItem(item, item._id)" ion-button color="primary">
+          <ion-icon slot="icon-only" name="pencil-outline">Taken</ion-icon>
+          Taken
+        </ion-item-option>
+
+       <ion-item-option (click)="openCamera()" ion-button color="secondary">
+          <ion-icon slot="icon-only" name="camera-sharp">Camera</ion-icon>
+          Camera
+        </ion-item-option>
+
+        <ion-item-option (click)="removeItem(item._id)" ion-button color="success">
+          <ion-icon slot="icon-only" name="trash"></ion-icon>
+          Delete
+        </ion-item-option>
+      </ion-item-options>
+    
+    </ion-item-sliding>
+  </ion-list>
+
+  <ion-fab slot="fixed" vertical="bottom" horizontal="end">
+    <ion-fab-button (click)="addItem()">
+      <ion-icon name="add"></ion-icon>
+    </ion-fab-button>
+  </ion-fab>
 
   <app-explore-container name="Tab 1 page"></app-explore-container>
 </ion-content>
