@@ -6,6 +6,7 @@ import { Subscription } from 'rxjs';
 import { Camera, CameraOptions } from '@ionic-native/camera/ngx';
 import { HttpClientModule } from '@angular/common/http';
 
+
 @Component({
   selector: 'app-tab1',
   templateUrl: 'tab1.page.html',
@@ -32,7 +33,6 @@ export class Tab1Page {
   }
 
   ngOnDestroy() {
-    // Unsubscribe from the itemsSubscription to avoid memory leaks
     if (this.itemsSubscription) {
       this.itemsSubscription.unsubscribe();
     }
@@ -45,7 +45,6 @@ export class Tab1Page {
     );
   }
 
-  
   removeItem(id: string) {
     this.dataService.removeItem(id);
   }
@@ -62,18 +61,20 @@ export class Tab1Page {
       await this.presentAlert();
     } 
   }
+
   async presentAlert() {
     const alert = await this.alertCtrl.create({
       header: 'Order Now!',
-      message: 'Please order more medication!.',
+      message: 'Please order more medication!',
       buttons: ['OK']
     });
 
     await alert.present();
   }
+
   async editItemPrompt(item: { name: string; quantity: any }, id: any) {
     const toast = await this.toastCtrl.create({
-      message: 'Editing Item-' + item + "...",
+      message: 'Editing Item-' + item + '...',
       duration: 3000
     });
     toast.present();
@@ -85,44 +86,45 @@ export class Tab1Page {
     this.inputDialogService.showPrompt();
   }
 
+  // Allow Camera Use
 
+  async openCamera() {
+    const options: CameraOptions = {
+      quality: 100,
+      destinationType: this.camera.DestinationType.DATA_URL,
+      encodingType: this.camera.EncodingType.JPEG,
+      mediaType: this.camera.MediaType.PICTURE,
+    };
 
-async openCamera() {
-  const options: CameraOptions = {
-    quality: 100,
-    destinationType: this.camera.DestinationType.DATA_URL,
-    encodingType: this.camera.EncodingType.JPEG,
-    mediaType: this.camera.MediaType.PICTURE,
-  };
-
-  try {
-    const imageData = await this.camera.getPicture(options);
-    // imageData is a base64 encoded string
-    const base64Image = 'data:image/jpeg;base64,' + imageData;
-
-    // Now, you can send the image data to your server
-    this.uploadImage(base64Image);
-  } catch (error) {
-    console.error('Error while taking a picture', error);
-  }
-}
-
-private uploadImage(imageData: string) {
-  const apiUrl = 'http://localhost:8080/api/pills'; // Replace with your actual server endpoint
-
-  // Assuming you want to send the image as base64 data in the request body
-  const requestBody = { image: imageData };
-
-  this.http.post(apiUrl, requestBody).subscribe(
-    (response: any) => {
-      console.log('Image uploaded successfully', response);
-      // Handle the response from the server as needed
-    },
-    (error: any) => {
-      console.error('Error uploading image', error);
-      // Handle the error
+    try {
+      const imageData = await this.camera.getPicture(options);
+      const base64Image = 'data:image/jpeg;base64,' + imageData;
+      this.uploadImage(base64Image);
+    } catch (error) {
+      console.error('Error while taking a picture', error);
     }
-  );
-}
+  }
 
+  // Send image to server
+  private uploadImage(imageData: string) {
+    const apiUrl = 'http://localhost:8080/api/pills';
+  
+    const requestBody = { image: imageData };
+  
+    this.http.post(apiUrl, requestBody).subscribe(
+      (response: any) => {
+        console.log('Image uploaded successfully', response);
+  
+        const imageUrl = response.imageUrl;
+        const newItemId = response._id;
+  
+        // Update the items array with the new item
+        const newItem = { name: 'New Item', quantity: 1, imageUrl: imageUrl, id: newItemId };
+        this.items.push(newItem);
+      },
+      (error: any) => {
+        console.error('Error uploading image', error);
+      }
+    );
+  }
 }

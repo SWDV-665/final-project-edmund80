@@ -42,7 +42,7 @@ export class InputDialogServiceService {
               // If id is defined, it means we are editing an existing item
               this.dataService.editItem({ ...editedItem, _id: id });
             } else {
-              // If id is not defined, it means we are adding a new item
+              // If id is not defined then add new item
               this.dataService.addItem(editedItem);
             }
           }
