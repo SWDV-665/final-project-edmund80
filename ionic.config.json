@@ -1,0 +1,8 @@
+{
+  "name": "pills",
+  "integrations": {
+    "capacitor": {},
+    "cordova": {}
+  },
+  "type": "angular"
+}
